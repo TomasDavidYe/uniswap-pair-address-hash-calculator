@@ -1,4 +1,4 @@
-from eth_abi.packed import encode_abi_packed
+from eth_abi.packed import encode_packed
 from web3 import Web3
 
 
@@ -26,8 +26,8 @@ class HashService:
         self.factory_address = factory_address
 
     def calculate_pair_adress(self, tokenA, tokenB):
-        tokenA = Web3.toChecksumAddress(tokenA)
-        tokenB = Web3.toChecksumAddress(tokenB)
+        tokenA = Web3.to_checksum_address(tokenA)
+        tokenB = Web3.to_checksum_address(tokenB)
 
         tokenA_hex = bytes.fromhex(tokenA[2:])
         tokenB_hex = bytes.fromhex(tokenB[2:])
@@ -38,13 +38,13 @@ class HashService:
             token1 = tokenA
             token0 = tokenB
 
-        b_salt = Web3.keccak(encode_abi_packed(['address', 'address'], [token0, token1]))
+        b_salt = Web3.keccak(encode_packed(['address', 'address'], [token0, token1]))
 
         pre = '0xff'
         b_pre = bytes.fromhex(pre[2:])
         b_address = bytes.fromhex(self.factory_address[2:])
         b_init_code = bytes.fromhex(self.init_code_hash[2:])
         b_result = Web3.keccak(
-            encode_abi_packed(['bytes', 'bytes', 'bytes', 'bytes'], [b_pre, b_address, b_salt, b_init_code]))
-        result_address = Web3.toChecksumAddress(b_result[12:].hex())
+            encode_packed(['bytes', 'bytes', 'bytes', 'bytes'], [b_pre, b_address, b_salt, b_init_code]))
+        result_address = Web3.to_checksum_address(b_result[12:].hex())
         return result_address, token0, token1
